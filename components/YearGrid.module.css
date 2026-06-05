@@ -1,14 +1,19 @@
+/* ============================================================
+   Mobile-first: base rules target small/touch screens.
+   Larger layouts are layered on via min-width media queries.
+   ============================================================ */
+
 .shell {
   max-width: 1100px;
   margin: 0 auto;
-  padding: clamp(1.5rem, 4vw, 4rem) clamp(1rem, 4vw, 3rem) 4rem;
+  padding: 1.25rem 1rem 3rem;
 }
 
 .booting {
   color: var(--text-dim);
   font-size: 0.85rem;
   letter-spacing: 0.1em;
-  padding: 6rem 0;
+  padding: 5rem 0;
   text-align: center;
   animation: pulse 1.4s ease-in-out infinite;
 }
@@ -18,8 +23,8 @@
   border: 1px solid var(--border);
   border-radius: 14px;
   background: linear-gradient(180deg, var(--bg-elevated), rgba(5, 7, 10, 0.4));
-  padding: clamp(1.1rem, 3vw, 1.8rem);
-  margin-bottom: 2.2rem;
+  padding: 1.1rem;
+  margin-bottom: 1.6rem;
   box-shadow: 0 0 40px rgba(0, 255, 200, 0.04), inset 0 0 30px rgba(0, 0, 0, 0.4);
 }
 
@@ -27,12 +32,12 @@
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  gap: 1rem;
+  gap: 0.5rem 1rem;
   flex-wrap: wrap;
 }
 
 .title {
-  font-size: clamp(2rem, 7vw, 3.4rem);
+  font-size: clamp(1.7rem, 9vw, 3.4rem);
   font-weight: 700;
   letter-spacing: 0.04em;
   line-height: 1;
@@ -40,6 +45,7 @@
   display: flex;
   align-items: baseline;
   gap: 0.15em;
+  flex-wrap: wrap;
 }
 
 .bracket {
@@ -48,15 +54,15 @@
 }
 
 .subtitle {
-  font-size: 0.85rem;
+  font-size: clamp(0.65rem, 2.6vw, 0.85rem);
   color: var(--text-dim);
   letter-spacing: 0.18em;
-  margin-left: 0.6em;
+  margin-left: 0.4em;
   font-weight: 400;
 }
 
 .pct {
-  font-size: clamp(1.6rem, 5vw, 2.6rem);
+  font-size: clamp(1.5rem, 8vw, 2.6rem);
   font-weight: 700;
   color: var(--accent);
   text-shadow: 0 0 22px var(--accent-glow);
@@ -69,8 +75,7 @@
   height: 6px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.04);
-  margin: 1.4rem 0 1.6rem;
-  overflow: visible;
+  margin: 1.1rem 0 1.3rem;
 }
 
 .progressFill {
@@ -98,8 +103,8 @@
 /* ---------- Stats ---------- */
 .stats {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
-  gap: 0.6rem 1.4rem;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.7rem 1rem;
 }
 
 .stat {
@@ -109,13 +114,13 @@
 }
 
 .statLabel {
-  font-size: 0.62rem;
-  letter-spacing: 0.22em;
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
   color: var(--text-dim);
 }
 
 .statValue {
-  font-size: 1.05rem;
+  font-size: 1rem;
   font-weight: 600;
   color: var(--text);
   font-variant-numeric: tabular-nums;
@@ -126,40 +131,64 @@
   text-shadow: 0 0 12px var(--accent-glow);
 }
 
+/* ---------- Active-day readout (primary detail surface on touch) ---------- */
+.readout {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin-top: 1.1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+
+.readoutDot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex: none;
+}
+
+.readoutDate {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.readoutMeta {
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+  margin-left: auto;
+}
+
 /* ---------- Dot grid ---------- */
 .grid {
   display: flex;
   flex-direction: column;
-  gap: 0.55rem;
+  gap: 0.7rem;
 }
 
 .monthRow {
   display: grid;
-  grid-template-columns: 3.2rem 1fr;
+  grid-template-columns: 2.2rem 1fr;
   align-items: center;
-  gap: 0.8rem;
+  gap: 0.6rem;
 }
 
 .monthLabel {
-  font-size: 0.68rem;
-  letter-spacing: 0.18em;
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
   color: var(--text-dim);
   text-align: right;
   user-select: none;
 }
 
+/* Mobile: let dots wrap and stay finger-friendly via auto-fill. */
 .dots {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(0, 1fr));
-  grid-auto-rows: 1fr;
-  gap: clamp(3px, 0.9vw, 7px);
-}
-
-/* Keep a steady dot count per row on wider screens for a clean matrix look */
-@media (min-width: 720px) {
-  .dots {
-    grid-template-columns: repeat(31, 1fr);
-  }
+  grid-template-columns: repeat(auto-fill, minmax(14px, 1fr));
+  gap: 6px;
 }
 
 .dot {
@@ -171,27 +200,28 @@
   border-radius: 50%;
   cursor: pointer;
   background: var(--future);
+  /* Roomier hit target than the visual dot, without affecting layout. */
+  outline-offset: 2px;
   transition: transform 0.12s ease, box-shadow 0.2s ease, background 0.2s ease;
 }
 
-.dot:hover {
-  transform: scale(1.45);
-  z-index: 2;
+.dot:active {
+  transform: scale(1.3);
 }
 
 .dot:focus-visible {
   outline: 2px solid var(--accent);
-  outline-offset: 2px;
+}
+
+.dot.selected {
+  transform: scale(1.4);
+  box-shadow: 0 0 0 2px var(--bg), 0 0 0 3px var(--accent), 0 0 12px var(--accent-glow);
+  z-index: 3;
 }
 
 .past {
   background: var(--past);
   box-shadow: 0 0 4px rgba(47, 212, 180, 0.25);
-}
-
-.past:hover {
-  background: var(--past-bright);
-  box-shadow: 0 0 10px rgba(47, 212, 180, 0.6);
 }
 
 .today {
@@ -205,17 +235,13 @@
   border: 1px solid rgba(120, 200, 255, 0.06);
 }
 
-.future:hover {
-  background: #243340;
-}
-
 /* ---------- Legend ---------- */
 .legend {
   display: flex;
   align-items: center;
-  gap: 1.4rem;
-  margin-top: 2.4rem;
-  padding-top: 1.4rem;
+  gap: 0.9rem 1.2rem;
+  margin-top: 1.8rem;
+  padding-top: 1.2rem;
   border-top: 1px solid var(--border);
   flex-wrap: wrap;
 }
@@ -223,9 +249,9 @@
 .legendItem {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  font-size: 0.72rem;
-  letter-spacing: 0.12em;
+  gap: 0.45rem;
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
   color: var(--text-dim);
 }
 
@@ -238,15 +264,16 @@
 
 .legendSpacer {
   flex: 1;
+  min-width: 0;
 }
 
 .signature {
-  font-size: 0.72rem;
-  letter-spacing: 0.14em;
+  font-size: 0.66rem;
+  letter-spacing: 0.1em;
   color: var(--text-faint);
 }
 
-/* ---------- Tooltip ---------- */
+/* ---------- Tooltip (hover devices only) ---------- */
 .tooltip {
   position: fixed;
   top: 0;
@@ -259,6 +286,7 @@
   padding: 0.5rem 0.7rem;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(0, 255, 200, 0.08);
   white-space: nowrap;
+  display: none;
 }
 
 .tooltipDate {
@@ -272,6 +300,73 @@
   color: var(--accent);
   letter-spacing: 0.08em;
   margin-top: 0.15rem;
+}
+
+/* ============================================================
+   Enhancements for larger / hover-capable screens
+   ============================================================ */
+
+/* Slightly roomier shell on tablets up. */
+@media (min-width: 480px) {
+  .shell {
+    padding: 2rem 1.5rem 3.5rem;
+  }
+  .stats {
+    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+    gap: 0.6rem 1.4rem;
+  }
+}
+
+/* Tablet/desktop: switch to the aligned 31-column "matrix" look. */
+@media (min-width: 720px) {
+  .shell {
+    padding: clamp(2.5rem, 4vw, 4rem) clamp(2rem, 4vw, 3rem) 4rem;
+  }
+  .header {
+    padding: clamp(1.3rem, 3vw, 1.8rem);
+    margin-bottom: 2.2rem;
+  }
+  .monthRow {
+    grid-template-columns: 3.2rem 1fr;
+    gap: 0.8rem;
+  }
+  .monthLabel {
+    font-size: 0.68rem;
+    letter-spacing: 0.18em;
+  }
+  .dots {
+    grid-template-columns: repeat(31, 1fr);
+    gap: clamp(3px, 0.9vw, 7px);
+  }
+}
+
+/* Only devices with a real pointer get hover affordances + the tooltip. */
+@media (hover: hover) and (pointer: fine) {
+  .dot:hover {
+    transform: scale(1.45);
+    z-index: 2;
+  }
+  .past:hover {
+    background: var(--past-bright);
+    box-shadow: 0 0 10px rgba(47, 212, 180, 0.6);
+  }
+  .future:hover {
+    background: #243340;
+  }
+  .tooltip {
+    display: block;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .today,
+  .progressHead,
+  .booting {
+    animation: none;
+  }
+  .dot {
+    transition: none;
+  }
 }
 
 @keyframes pulse {

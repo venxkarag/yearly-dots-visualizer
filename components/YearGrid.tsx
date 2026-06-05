@@ -20,6 +20,7 @@ export default function YearGrid() {
   // between server time and the visitor's local time.
   const [now, setNow] = useState<Date | null>(null);
   const [hover, setHover] = useState<HoverState | null>(null);
+  const [selected, setSelected] = useState<DayCell | null>(null);
 
   useEffect(() => {
     setNow(new Date());
@@ -35,6 +36,18 @@ export default function YearGrid() {
     () => (now ? buildYear(now) : null),
     [now]
   );
+
+  // The cell shown in the readout: hover (desktop) > tap selection > today.
+  const todayCell = useMemo(() => {
+    if (!model) return null;
+    for (const m of model.months) {
+      const t = m.days.find((d) => d.status === "today");
+      if (t) return t;
+    }
+    return null;
+  }, [model]);
+
+  const active: DayCell | null = hover?.cell ?? selected ?? todayCell;
 
   if (!model) {
     return (
@@ -60,26 +73,27 @@ export default function YearGrid() {
         </div>
 
         <div className={styles.progressTrack}>
-          <div
-            className={styles.progressFill}
-            style={{ width: `${pct}%` }}
-          />
-          <div
-            className={styles.progressHead}
-            style={{ left: `${pct}%` }}
-          />
+          <div className={styles.progressFill} style={{ width: `${pct}%` }} />
+          <div className={styles.progressHead} style={{ left: `${pct}%` }} />
         </div>
 
         <div className={styles.stats}>
           <Stat label="DAY" value={`${model.dayOfYear}/${model.totalDays}`} />
           <Stat label="ELAPSED" value={`${model.daysPassed}d`} />
           <Stat label="REMAINING" value={`${model.daysRemaining}d`} accent />
-          <Stat
-            label="WEEK"
-            value={`${Math.ceil(model.dayOfYear / 7)}/53`}
-          />
+          <Stat label="WEEK" value={`${Math.ceil(model.dayOfYear / 7)}/53`} />
           <Stat label="LEAP" value={model.isLeapYear ? "TRUE" : "FALSE"} />
         </div>
+
+        {active && (
+          <div className={styles.readout} aria-live="polite">
+            <span className={`${styles.readoutDot} ${styles[active.status]}`} />
+            <span className={styles.readoutDate}>{formatDate(active.date)}</span>
+            <span className={styles.readoutMeta}>
+              day {active.dayOfYear} · {active.status}
+            </span>
+          </div>
+        )}
       </header>
 
       <section className={styles.grid} aria-label="Days of the year">
@@ -87,29 +101,32 @@ export default function YearGrid() {
           <div className={styles.monthRow} key={group.month}>
             <div className={styles.monthLabel}>{group.label}</div>
             <div className={styles.dots}>
-              {group.days.map((cell) => (
-                <button
-                  key={cell.dayOfYear}
-                  type="button"
-                  className={`${styles.dot} ${styles[cell.status]}`}
-                  aria-label={`${formatDate(cell.date)} — ${cell.status}`}
-                  onMouseEnter={(e) =>
-                    setHover({
-                      cell,
-                      x: e.clientX,
-                      y: e.clientY,
-                    })
-                  }
-                  onMouseMove={(e) =>
-                    setHover({
-                      cell,
-                      x: e.clientX,
-                      y: e.clientY,
-                    })
-                  }
-                  onMouseLeave={() => setHover(null)}
-                />
-              ))}
+              {group.days.map((cell) => {
+                const isSelected = selected?.dayOfYear === cell.dayOfYear;
+                return (
+                  <button
+                    key={cell.dayOfYear}
+                    type="button"
+                    className={`${styles.dot} ${styles[cell.status]} ${
+                      isSelected ? styles.selected : ""
+                    }`}
+                    aria-label={`${formatDate(cell.date)} — ${cell.status}`}
+                    aria-pressed={isSelected}
+                    onClick={() =>
+                      setSelected((prev) =>
+                        prev?.dayOfYear === cell.dayOfYear ? null : cell
+                      )
+                    }
+                    onMouseEnter={(e) =>
+                      setHover({ cell, x: e.clientX, y: e.clientY })
+                    }
+                    onMouseMove={(e) =>
+                      setHover({ cell, x: e.clientX, y: e.clientY })
+                    }
+                    onMouseLeave={() => setHover(null)}
+                  />
+                );
+              })}
             </div>
           </div>
         ))}
@@ -120,9 +137,11 @@ export default function YearGrid() {
         <LegendItem className={styles.today} label="today" />
         <LegendItem className={styles.future} label="remaining" />
         <div className={styles.legendSpacer} />
-        <span className={styles.signature}>each dot = one day</span>
+        <span className={styles.signature}>tap a dot · each dot = one day</span>
       </footer>
 
+      {/* Cursor-following tooltip — only meaningful on hover-capable devices;
+          hidden via CSS on touch, where the header readout takes over. */}
       {hover && (
         <div
           className={styles.tooltip}
