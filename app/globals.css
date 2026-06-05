@@ -1,0 +1,50 @@
+:root {
+  --bg: #05070a;
+  --bg-elevated: #0a0e14;
+  --grid-line: rgba(0, 255, 200, 0.05);
+  --border: rgba(120, 200, 255, 0.1);
+  --text: #c7d2dc;
+  --text-dim: #5a6b7a;
+  --text-faint: #2c3a47;
+
+  --accent: #00ffc8;
+  --accent-glow: rgba(0, 255, 200, 0.55);
+  --accent-soft: rgba(0, 255, 200, 0.12);
+
+  --past: #1f8f7a;
+  --past-bright: #2fd4b4;
+  --today: #00ffc8;
+  --future: #18222b;
+
+  --mono: ui-monospace, "SF Mono", "JetBrains Mono", "Fira Code", Menlo,
+    Consolas, monospace;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--mono);
+  -webkit-font-smoothing: antialiased;
+  min-height: 100%;
+}
+
+body {
+  background-image:
+    radial-gradient(circle at 50% -20%, rgba(0, 255, 200, 0.08), transparent 60%),
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 100% 100%, 40px 40px, 40px 40px;
+  background-attachment: fixed;
+}
+
+::selection {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
